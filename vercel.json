@@ -7,29 +7,11 @@
     }
   ],
   "routes": [
-    {
-      "src": "/anilist/search",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/anilist/trending",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/anilist/upcoming",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/anilist/anime",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/aniworld/search",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/aniworld/episodes",
-      "dest": "/index.js"
-    }
+    { "src": "/anilist/search", "dest": "/index.js" },
+    { "src": "/anilist/trending", "dest": "/index.js" },
+    { "src": "/anilist/upcoming", "dest": "/index.js" },
+    { "src": "/anilist/anime", "dest": "/index.js" },
+    { "src": "/aniworld/search", "dest": "/index.js" },
+    { "src": "/aniworld/episodes", "dest": "/index.js" }
   ]
 }

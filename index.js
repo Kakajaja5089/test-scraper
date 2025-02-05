@@ -1,33 +1,43 @@
-export default {
-    async fetch(request) {
-        const url = new URL(request.url);
-        const path = url.pathname;
-        const params = Object.fromEntries(url.searchParams.entries());
+const express = require("express");
+const fetch = require("node-fetch");
+const app = express();
 
-        if (path.startsWith("/anilist/search")) {
-            return new Response(JSON.stringify(await getAnilistSearch(params.q)), { headers: { "Content-Type": "application/json" } });
-        }
-        if (path.startsWith("/anilist/trending")) {
-            return new Response(JSON.stringify(await getAnilistTrending()), { headers: { "Content-Type": "application/json" } });
-        }
-        if (path.startsWith("/anilist/upcoming")) {
-            return new Response(JSON.stringify(await getAnilistUpcoming(1)), { headers: { "Content-Type": "application/json" } });
-        }
-        if (path.startsWith("/anilist/anime")) {
-            return new Response(JSON.stringify(await getAnilistAnime(params.id)), { headers: { "Content-Type": "application/json" } });
-        }
-        if (path.startsWith("/aniworld/search")) {
-            return new Response(JSON.stringify(await scrapeAniWorldSearch(params.q)), { headers: { "Content-Type": "application/json" } });
-        }
-        if (path.startsWith("/aniworld/episodes")) {
-            return new Response(JSON.stringify(await scrapeAniWorldEpisodes(params.id)), { headers: { "Content-Type": "application/json" } });
-        }
+app.use(express.json());
 
-        return new Response("Invalid endpoint", { status: 404 });
-    }
-};
+app.get("/anilist/search", async (req, res) => {
+    if (!req.query.q) return res.status(400).json({ error: "Missing query parameter 'q'" });
+    const data = await getAnilistSearch(req.query.q);
+    res.json(data);
+});
 
-// --- Anilist Functions (Your provided code) ---
+app.get("/anilist/trending", async (_, res) => {
+    const data = await getAnilistTrending();
+    res.json(data);
+});
+
+app.get("/anilist/upcoming", async (_, res) => {
+    const data = await getAnilistUpcoming(1);
+    res.json(data);
+});
+
+app.get("/anilist/anime", async (req, res) => {
+    if (!req.query.id) return res.status(400).json({ error: "Missing query parameter 'id'" });
+    const data = await getAnilistAnime(req.query.id);
+    res.json(data);
+});
+
+// Example placeholders for AniWorld scraping
+app.get("/aniworld/search", async (req, res) => {
+    if (!req.query.q) return res.status(400).json({ error: "Missing query parameter 'q'" });
+    res.json({ message: "Scraping logic for AniWorld search goes here." });
+});
+
+app.get("/aniworld/episodes", async (req, res) => {
+    if (!req.query.id) return res.status(400).json({ error: "Missing query parameter 'id'" });
+    res.json({ message: "Scraping logic for AniWorld episodes goes here." });
+});
+
+// AniList Functions (Modified)
 async function fetchAniList(query) {
     const url = "https://graphql.anilist.co";
     const options = {
@@ -63,21 +73,5 @@ async function getAnilistAnime(id) {
     return data.data.Media;
 }
 
-// --- AniWorld Scraping Functions ---
-async function scrapeAniWorldSearch(query) {
-    const url = `https://aniworld.to/search?keyword=${encodeURIComponent(query)}`;
-    const response = await fetch(url);
-    const text = await response.text();
-    
-    // Use Cheerio or regex to extract anime search results
-    return { message: "Scraping logic needed here." };
-}
-
-async function scrapeAniWorldEpisodes(id) {
-    const url = `https://aniworld.to/anime/${id}`;
-    const response = await fetch(url);
-    const text = await response.text();
-
-    // Extract episode links (VOE, Vidoza, etc.)
-    return { message: "Scraping logic needed here." };
-}
+// Express.js export for Vercel
+module.exports = app;
